@@ -67,7 +67,7 @@ export default function HabnetSolutions() {
       setHeroBgIndex((prev) => (prev + 1) % heroImages.length);
     }, 4000); // Change every 4 seconds
     return () => clearInterval(interval);
-  }, []);
+  }, [heroImages.length]);
 
   // Handle scroll events for animations and back to top button
   useEffect(() => {
@@ -708,7 +708,7 @@ export default function HabnetSolutions() {
                     </h3>
                     <p className="text-gray-700 text-lg leading-relaxed mb-6">
                       We offer borehole drilling services at a very competitive price. We carefully listen to our
-                      clients' dynamics and attend to them accordingly. Habnet Solutions Limited has the skills and
+                      clients&apos; dynamics and attend to them accordingly. Habnet Solutions Limited has the skills and
                       technology to expertly replace old and worn sewer lines or install brand new piping.
                     </p>
                     <div className="space-y-3">
@@ -911,7 +911,7 @@ export default function HabnetSolutions() {
                 <CardHeader>
                   <CardTitle className="text-2xl text-gray-900">Send Us a Message</CardTitle>
                   <CardDescription>
-                    Fill out the form below and we'll get back to you as soon as possible.
+                    Fill out the form below and we&apos;ll get back to you as soon as possible.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

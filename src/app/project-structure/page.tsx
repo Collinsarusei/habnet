@@ -3,7 +3,7 @@
 import React from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Users, User, Briefcase, Settings, Layers, HardHat, ChevronDown, ChevronRight } from "lucide-react"
+import { Users, User, Briefcase, Settings, Layers, HardHat, ChevronDown } from "lucide-react"
 
 const Box = ({ children, icon = null, className = "" }: { children: React.ReactNode, icon?: React.ReactNode, className?: string }) => (
   <div className={`relative flex flex-col items-center bg-white/90 border border-blue-200 shadow-md rounded-lg px-3 py-1 sm:px-6 sm:py-2 font-semibold text-blue-900 transition-transform hover:scale-105 hover:shadow-xl text-xs sm:text-base ${className}`}>
