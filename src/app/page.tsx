@@ -493,7 +493,7 @@ export default function HabnetSolutions() {
           <div className="animate-on-scroll">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               {/* Service Category Tabs */}
-              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 mb-8 bg-gray-100 p-1 rounded-lg">
+              <TabsList className="flex w-full overflow-x-auto no-scrollbar mb-8 bg-gray-100 p-1 rounded-lg gap-2">
                 <TabsTrigger value="general-supply" className="text-sm">
                   General Supply
                 </TabsTrigger>
@@ -516,13 +516,13 @@ export default function HabnetSolutions() {
 
               {/* General Supply Tab Content */}
               <TabsContent value="general-supply" className="space-y-6">
-                <div className="grid lg:grid-cols-2 gap-8 items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
                   <div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
                       <Package className="mr-3 h-6 w-6 text-blue-600" />
                       General Supply of Goods
                     </h3>
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {[
                         "Printing services",
                         "Supplies of office stationery",
@@ -540,13 +540,13 @@ export default function HabnetSolutions() {
                       ))}
                     </div>
                   </div>
-                  <div>
+                  <div className="w-full flex justify-center">
                     <Image
                       src="/images/constructin_materials.jpg"
                       alt="Construction materials and office supplies"
-                      width={400}
-                      height={300}
-                      className="rounded-lg shadow-lg"
+                      width={320}
+                      height={200}
+                      className="rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm lg:max-w-md"
                       style={{ height: 'auto' }}
                       onError={(e) => {
                         e.currentTarget.src = "/images/constructin_materials.jpg"
@@ -558,13 +558,13 @@ export default function HabnetSolutions() {
 
               {/* Food Supply Tab Content */}
               <TabsContent value="food-supply" className="space-y-6">
-                <div className="grid lg:grid-cols-2 gap-8 items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
                   <div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
                       <Utensils className="mr-3 h-6 w-6 text-green-600" />
                       Food Supply
                     </h3>
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {[
                         "Granola and energy bars",
                         "Dry cereal",
@@ -594,13 +594,13 @@ export default function HabnetSolutions() {
                       ))}
                     </div>
                   </div>
-                  <div>
+                  <div className="w-full flex justify-center">
                     <Image
                       src="/images/food.jpg"
                       alt="Fresh fruits, vegetables, and various food items"
-                      width={400}
-                      height={300}
-                      className="rounded-lg shadow-lg"
+                      width={320}
+                      height={200}
+                      className="rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm lg:max-w-md"
                       onError={(e) => {
                         e.currentTarget.src = "/images/food.jpg"
                       }}
@@ -611,7 +611,7 @@ export default function HabnetSolutions() {
 
               {/* House Construction Tab Content */}
               <TabsContent value="construction" className="space-y-6">
-                <div className="grid lg:grid-cols-2 gap-8 items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
                   <div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
                       <Building className="mr-3 h-6 w-6 text-orange-600" />
@@ -637,13 +637,13 @@ export default function HabnetSolutions() {
                       ))}
                     </div>
                   </div>
-                  <div>
+                  <div className="w-full flex justify-center">
                     <Image
                       src="/images/construction.jpg"
                       alt="Modern building construction project"
-                      width={400}
-                      height={300}
-                      className="rounded-lg shadow-lg"
+                      width={320}
+                      height={200}
+                      className="rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm lg:max-w-md"
                       onError={(e) => {
                         e.currentTarget.src = "/images/construction.jpg"
                       }}
@@ -654,7 +654,7 @@ export default function HabnetSolutions() {
 
               {/* Road Construction Tab Content */}
               <TabsContent value="road-construction" className="space-y-6">
-                <div className="grid lg:grid-cols-2 gap-8 items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
                   <div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
                       <Truck className="mr-3 h-6 w-6 text-yellow-600" />
@@ -700,7 +700,7 @@ export default function HabnetSolutions() {
 
               {/* Borehole Drilling Tab Content */}
               <TabsContent value="borehole" className="space-y-6">
-                <div className="grid lg:grid-cols-2 gap-8 items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
                   <div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
                       <Droplets className="mr-3 h-6 w-6 text-blue-600" />
@@ -746,7 +746,7 @@ export default function HabnetSolutions() {
 
               {/* Construction Materials Tab Content */}
               <TabsContent value="materials" className="space-y-6">
-                <div className="grid lg:grid-cols-2 gap-8 items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
                   <div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
                       <Wrench className="mr-3 h-6 w-6 text-red-600" />
@@ -755,7 +755,7 @@ export default function HabnetSolutions() {
                     <p className="text-gray-700 text-lg leading-relaxed mb-6">
                       We supply a comprehensive range of building materials to meet all your construction needs.
                     </p>
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {[
                         "Fencing materials",
                         "Building Supplies",
@@ -781,13 +781,13 @@ export default function HabnetSolutions() {
                       ))}
                     </div>
                   </div>
-                  <div>
+                  <div className="w-full flex justify-center">
                     <Image
                       src="/images/constructin_materials.jpg"
                       alt="Various construction materials and building supplies"
-                      width={400}
-                      height={300}
-                      className="rounded-lg shadow-lg"
+                      width={320}
+                      height={200}
+                      className="rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm lg:max-w-md"
                       onError={(e) => {
                         e.currentTarget.src = "/images/constructin_materials.jpg"
                       }}
