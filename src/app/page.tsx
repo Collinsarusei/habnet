@@ -29,9 +29,12 @@ import {
   Package,
   Utensils,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 import Image from "next/image"
 import emailjs from 'emailjs-com'
+import Globe3D from '@/components/Globe3D';
 
 export default function HabnetSolutions() {
   // State for mobile menu toggle
@@ -200,6 +203,49 @@ export default function HabnetSolutions() {
       description: "Financial Responsibility to our stakeholders",
     },
   ]
+
+  // Service tab values in order
+  const serviceTabs = [
+    "general-supply",
+    "food-supply",
+    "construction",
+    "road-construction",
+    "borehole",
+    "materials",
+    "travel-agency",
+    "tourism",
+  ];
+
+  const [globeWidth, setGlobeWidth] = useState(420);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setGlobeWidth(Math.min(window.innerWidth - 32, 420));
+    }
+  }, []);
+
+  // Add state for image navigation in Travel Agency and Tourism tabs
+  const [tourismImgIdx, setTourismImgIdx] = useState(0);
+  const tourismImages = [
+    "/images/safari1.jpg",
+    "/images/safari2.jpeg",
+    "/images/safari3.jpeg",
+    "/images/travel1.jpg",
+    "/images/travel2.jpeg",
+  ];
+
+  // Add state and image arrays for all service tabs
+  const [generalImgIdx, setGeneralImgIdx] = useState(0);
+  const generalImages = ["/images/constructin_materials.jpg"];
+  const [foodImgIdx, setFoodImgIdx] = useState(0);
+  const foodImages = ["/images/food.jpg"];
+  const [constructionImgIdx, setConstructionImgIdx] = useState(0);
+  const constructionImages = ["/images/construction.jpg"];
+  const [roadImgIdx, setRoadImgIdx] = useState(0);
+  const roadImages = ["/images/road construction.jpg"];
+  const [boreholeImgIdx, setBoreholeImgIdx] = useState(0);
+  const boreholeImages = ["/images/borehole drilling.jpg"];
+  const [materialsImgIdx, setMaterialsImgIdx] = useState(0);
+  const materialsImages = ["/images/constructin_materials.jpg"];
 
   return (
     <div className="min-h-screen bg-white">
@@ -488,31 +534,69 @@ export default function HabnetSolutions() {
               Engineering and Architectural works. Our team of highly qualified professionals is dedicated to building a
               relationship based on mutual trust in order to bring the best services possible to our clients.
             </p>
+            <p className="text-base md:text-lg text-blue-700 font-semibold mt-4 mb-2 max-w-2xl mx-auto">
+              We are recognized internationally. <span className="underline cursor-pointer">See our Global Reach page.</span>
+            </p>
           </div>
+
+          {/* 3D Globe Animation */}
+          <Globe3D width={globeWidth} />
 
           <div className="animate-on-scroll">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               {/* Service Category Tabs */}
-              <TabsList className="flex w-full overflow-x-auto no-scrollbar mb-8 bg-gray-100 p-1 rounded-lg gap-2">
-                <TabsTrigger value="general-supply" className="text-sm">
-                  General Supply
-                </TabsTrigger>
-                <TabsTrigger value="food-supply" className="text-sm">
-                  Food Supply
-                </TabsTrigger>
-                <TabsTrigger value="construction" className="text-sm">
-                  Construction
-                </TabsTrigger>
-                <TabsTrigger value="road-construction" className="text-sm">
-                  Road Works
-                </TabsTrigger>
-                <TabsTrigger value="borehole" className="text-sm">
-                  Water & Sewerage
-                </TabsTrigger>
-                <TabsTrigger value="materials" className="text-sm">
-                  Materials
-                </TabsTrigger>
-              </TabsList>
+              <div className="flex items-center w-full mb-8">
+                <button
+                  aria-label="Previous Service"
+                  onClick={() => {
+                    const idx = serviceTabs.indexOf(activeTab);
+                    setActiveTab(serviceTabs[(idx - 1 + serviceTabs.length) % serviceTabs.length]);
+                  }}
+                  className="p-2 rounded-full bg-gray-200 hover:bg-blue-200 transition-colors mr-2"
+                  disabled={serviceTabs.length <= 1}
+                  style={{ visibility: serviceTabs.length > 1 ? 'visible' : 'hidden' }}
+                >
+                  <ChevronLeft className="h-5 w-5 text-blue-600" />
+                </button>
+                <TabsList className="flex-1 flex overflow-x-auto scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-blue-100 bg-gray-100 p-1 rounded-lg gap-2 snap-x">
+                  <TabsTrigger value="general-supply" className="text-sm">
+                    General Supply
+                  </TabsTrigger>
+                  <TabsTrigger value="food-supply" className="text-sm">
+                    Food Supply
+                  </TabsTrigger>
+                  <TabsTrigger value="construction" className="text-sm">
+                    Construction
+                  </TabsTrigger>
+                  <TabsTrigger value="road-construction" className="text-sm">
+                    Road Works
+                  </TabsTrigger>
+                  <TabsTrigger value="borehole" className="text-sm">
+                    Water & Sewerage
+                  </TabsTrigger>
+                  <TabsTrigger value="materials" className="text-sm">
+                    Materials
+                  </TabsTrigger>
+                  <TabsTrigger value="travel-agency" className="text-sm">
+                    Travel Agency Services
+                  </TabsTrigger>
+                  <TabsTrigger value="tourism" className="text-sm">
+                    Tourism Services
+                  </TabsTrigger>
+                </TabsList>
+                <button
+                  aria-label="Next Service"
+                  onClick={() => {
+                    const idx = serviceTabs.indexOf(activeTab);
+                    setActiveTab(serviceTabs[(idx + 1) % serviceTabs.length]);
+                  }}
+                  className="p-2 rounded-full bg-gray-200 hover:bg-blue-200 transition-colors ml-2"
+                  disabled={serviceTabs.length <= 1}
+                  style={{ visibility: serviceTabs.length > 1 ? 'visible' : 'hidden' }}
+                >
+                  <ChevronRight className="h-5 w-5 text-blue-600" />
+                </button>
+              </div>
 
               {/* General Supply Tab Content */}
               <TabsContent value="general-supply" className="space-y-6">
@@ -540,18 +624,35 @@ export default function HabnetSolutions() {
                       ))}
                     </div>
                   </div>
-                  <div className="w-full flex justify-center">
-                    <Image
-                      src="/images/constructin_materials.jpg"
-                      alt="Construction materials and office supplies"
-                      width={320}
-                      height={200}
-                      className="rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm lg:max-w-md"
-                      style={{ height: 'auto' }}
-                      onError={(e) => {
-                        e.currentTarget.src = "/images/constructin_materials.jpg"
-                      }}
-                    />
+                  <div className="w-full flex flex-col items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-2">
+                      {generalImages.length > 1 && (
+                        <button
+                          aria-label="Previous General Image"
+                          onClick={() => setGeneralImgIdx((generalImgIdx - 1 + generalImages.length) % generalImages.length)}
+                          className="p-2 rounded-full bg-gray-200 hover:bg-blue-200 transition-colors"
+                        >
+                          <ChevronLeft className="h-5 w-5 text-blue-600" />
+                        </button>
+                      )}
+                      <Image
+                        src={generalImages[generalImgIdx]}
+                        alt="General supply service"
+                        width={420}
+                        height={260}
+                        className="rounded-lg shadow-lg w-full lg:w-full lg:max-w-none"
+                        style={{ height: 'auto' }}
+                      />
+                      {generalImages.length > 1 && (
+                        <button
+                          aria-label="Next General Image"
+                          onClick={() => setGeneralImgIdx((generalImgIdx + 1) % generalImages.length)}
+                          className="p-2 rounded-full bg-gray-200 hover:bg-blue-200 transition-colors"
+                        >
+                          <ChevronRight className="h-5 w-5 text-blue-600" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </TabsContent>
@@ -594,17 +695,35 @@ export default function HabnetSolutions() {
                       ))}
                     </div>
                   </div>
-                  <div className="w-full flex justify-center">
-                    <Image
-                      src="/images/food.jpg"
-                      alt="Fresh fruits, vegetables, and various food items"
-                      width={320}
-                      height={200}
-                      className="rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm lg:max-w-md"
-                      onError={(e) => {
-                        e.currentTarget.src = "/images/food.jpg"
-                      }}
-                    />
+                  <div className="w-full flex flex-col items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-2">
+                      {foodImages.length > 1 && (
+                        <button
+                          aria-label="Previous Food Image"
+                          onClick={() => setFoodImgIdx((foodImgIdx - 1 + foodImages.length) % foodImages.length)}
+                          className="p-2 rounded-full bg-gray-200 hover:bg-green-200 transition-colors"
+                        >
+                          <ChevronLeft className="h-5 w-5 text-green-600" />
+                        </button>
+                      )}
+                      <Image
+                        src={foodImages[foodImgIdx]}
+                        alt="Food supply service"
+                        width={420}
+                        height={260}
+                        className="rounded-lg shadow-lg w-full lg:w-full lg:max-w-none"
+                        style={{ height: 'auto' }}
+                      />
+                      {foodImages.length > 1 && (
+                        <button
+                          aria-label="Next Food Image"
+                          onClick={() => setFoodImgIdx((foodImgIdx + 1) % foodImages.length)}
+                          className="p-2 rounded-full bg-gray-200 hover:bg-green-200 transition-colors"
+                        >
+                          <ChevronRight className="h-5 w-5 text-green-600" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </TabsContent>
@@ -637,17 +756,35 @@ export default function HabnetSolutions() {
                       ))}
                     </div>
                   </div>
-                  <div className="w-full flex justify-center">
-                    <Image
-                      src="/images/construction.jpg"
-                      alt="Modern building construction project"
-                      width={320}
-                      height={200}
-                      className="rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm lg:max-w-md"
-                      onError={(e) => {
-                        e.currentTarget.src = "/images/construction.jpg"
-                      }}
-                    />
+                  <div className="w-full flex flex-col items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-2">
+                      {constructionImages.length > 1 && (
+                        <button
+                          aria-label="Previous Construction Image"
+                          onClick={() => setConstructionImgIdx((constructionImgIdx - 1 + constructionImages.length) % constructionImages.length)}
+                          className="p-2 rounded-full bg-gray-200 hover:bg-orange-200 transition-colors"
+                        >
+                          <ChevronLeft className="h-5 w-5 text-orange-600" />
+                        </button>
+                      )}
+                      <Image
+                        src={constructionImages[constructionImgIdx]}
+                        alt="House construction service"
+                        width={420}
+                        height={260}
+                        className="rounded-lg shadow-lg w-full lg:w-full lg:max-w-none"
+                        style={{ height: 'auto' }}
+                      />
+                      {constructionImages.length > 1 && (
+                        <button
+                          aria-label="Next Construction Image"
+                          onClick={() => setConstructionImgIdx((constructionImgIdx + 1) % constructionImages.length)}
+                          className="p-2 rounded-full bg-gray-200 hover:bg-orange-200 transition-colors"
+                        >
+                          <ChevronRight className="h-5 w-5 text-orange-600" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </TabsContent>
@@ -683,17 +820,35 @@ export default function HabnetSolutions() {
                       ))}
                     </div>
                   </div>
-                  <div>
-                    <Image
-                      src="/images/road construction.jpg"
-                      alt="Road construction with heavy machinery"
-                      width={400}
-                      height={300}
-                      className="rounded-lg shadow-lg"
-                      onError={(e) => {
-                        e.currentTarget.src = "/images/road construction.jpg"
-                      }}
-                    />
+                  <div className="w-full flex flex-col items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-2">
+                      {roadImages.length > 1 && (
+                        <button
+                          aria-label="Previous Road Image"
+                          onClick={() => setRoadImgIdx((roadImgIdx - 1 + roadImages.length) % roadImages.length)}
+                          className="p-2 rounded-full bg-gray-200 hover:bg-yellow-200 transition-colors"
+                        >
+                          <ChevronLeft className="h-5 w-5 text-yellow-600" />
+                        </button>
+                      )}
+                      <Image
+                        src={roadImages[roadImgIdx]}
+                        alt="Road construction service"
+                        width={420}
+                        height={260}
+                        className="rounded-lg shadow-lg w-full lg:w-full lg:max-w-none"
+                        style={{ height: 'auto' }}
+                      />
+                      {roadImages.length > 1 && (
+                        <button
+                          aria-label="Next Road Image"
+                          onClick={() => setRoadImgIdx((roadImgIdx + 1) % roadImages.length)}
+                          className="p-2 rounded-full bg-gray-200 hover:bg-yellow-200 transition-colors"
+                        >
+                          <ChevronRight className="h-5 w-5 text-yellow-600" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </TabsContent>
@@ -729,17 +884,35 @@ export default function HabnetSolutions() {
                       ))}
                     </div>
                   </div>
-                  <div>
-                    <Image
-                      src="/images/borehole drilling.jpg"
-                      alt="Water infrastructure and borehole drilling"
-                      width={400}
-                      height={300}
-                      className="rounded-lg shadow-lg"
-                      onError={(e) => {
-                        e.currentTarget.src = "/images/borehole drilling.jpg"
-                      }}
-                    />
+                  <div className="w-full flex flex-col items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-2">
+                      {boreholeImages.length > 1 && (
+                        <button
+                          aria-label="Previous Borehole Image"
+                          onClick={() => setBoreholeImgIdx((boreholeImgIdx - 1 + boreholeImages.length) % boreholeImages.length)}
+                          className="p-2 rounded-full bg-gray-200 hover:bg-blue-200 transition-colors"
+                        >
+                          <ChevronLeft className="h-5 w-5 text-blue-600" />
+                        </button>
+                      )}
+                      <Image
+                        src={boreholeImages[boreholeImgIdx]}
+                        alt="Borehole drilling service"
+                        width={420}
+                        height={260}
+                        className="rounded-lg shadow-lg w-full lg:w-full lg:max-w-none"
+                        style={{ height: 'auto' }}
+                      />
+                      {boreholeImages.length > 1 && (
+                        <button
+                          aria-label="Next Borehole Image"
+                          onClick={() => setBoreholeImgIdx((boreholeImgIdx + 1) % boreholeImages.length)}
+                          className="p-2 rounded-full bg-gray-200 hover:bg-blue-200 transition-colors"
+                        >
+                          <ChevronRight className="h-5 w-5 text-blue-600" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </TabsContent>
@@ -781,17 +954,138 @@ export default function HabnetSolutions() {
                       ))}
                     </div>
                   </div>
-                  <div className="w-full flex justify-center">
+                  <div className="w-full flex flex-col items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-2">
+                      {materialsImages.length > 1 && (
+                        <button
+                          aria-label="Previous Materials Image"
+                          onClick={() => setMaterialsImgIdx((materialsImgIdx - 1 + materialsImages.length) % materialsImages.length)}
+                          className="p-2 rounded-full bg-gray-200 hover:bg-red-200 transition-colors"
+                        >
+                          <ChevronLeft className="h-5 w-5 text-red-600" />
+                        </button>
+                      )}
+                      <Image
+                        src={materialsImages[materialsImgIdx]}
+                        alt="Construction materials service"
+                        width={420}
+                        height={260}
+                        className="rounded-lg shadow-lg w-full lg:w-full lg:max-w-none"
+                        style={{ height: 'auto' }}
+                      />
+                      {materialsImages.length > 1 && (
+                        <button
+                          aria-label="Next Materials Image"
+                          onClick={() => setMaterialsImgIdx((materialsImgIdx + 1) % materialsImages.length)}
+                          className="p-2 rounded-full bg-gray-200 hover:bg-red-200 transition-colors"
+                        >
+                          <ChevronRight className="h-5 w-5 text-red-600" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Travel Agency Services Tab Content */}
+              <TabsContent value="travel-agency" className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                      <Package className="mr-3 h-6 w-6 text-blue-600" />
+                      Travel Agency Services
+                    </h3>
+                    <p className="text-gray-700 text-lg leading-relaxed mb-6">
+                      Habnet Solutions Limited offers comprehensive travel agency services, ensuring seamless and efficient travel experiences for both individuals and corporate clients. We handle everything from flight bookings to complex itinerary planning, focusing on comfort, convenience, and value.
+                    </p>
+                    <div className="space-y-3">
+                      {[
+                        "Flight Reservations (Domestic & International)",
+                        "Hotel Bookings & Accommodation",
+                        "Visa Assistance & Immigration Support",
+                        "Car Rental Services",
+                        "Travel Insurance",
+                        "Corporate Travel Management",
+                        "Group Travel Arrangements",
+                        "Customized Itinerary Planning",
+                      ].map((item, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                          <span className="text-gray-700">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="w-full flex flex-col items-center justify-center gap-2">
                     <Image
-                      src="/images/constructin_materials.jpg"
-                      alt="Various construction materials and building supplies"
-                      width={320}
-                      height={200}
-                      className="rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm lg:max-w-md"
-                      onError={(e) => {
-                        e.currentTarget.src = "/images/constructin_materials.jpg"
-                      }}
+                      src="/images/travel1.jpg"
+                      alt="Travel agency service"
+                      width={420}
+                      height={260}
+                      className="rounded-lg shadow-lg w-full lg:w-full lg:max-w-none"
+                      style={{ height: 'auto' }}
                     />
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Tourism Services Tab Content */}
+              <TabsContent value="tourism" className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                      <Package className="mr-3 h-6 w-6 text-green-600" />
+                      Tourism Services
+                    </h3>
+                    <p className="text-gray-700 text-lg leading-relaxed mb-6">
+                      Explore the world with Habnet Solutions Limited. Our tourism services are designed to create unforgettable experiences, whether for leisure, adventure, or cultural immersion. We specialize in crafting personalized tour packages that cater to diverse interests and preferences.
+                    </p>
+                    <div className="space-y-3">
+                      {[
+                        "Safari & Wildlife Tours",
+                        "Cultural & Heritage Tours",
+                        "Adventure & Expedition Planning",
+                        "Holiday Packages (Local & International)",
+                        "Conference & Event Tourism (MICE)",
+                        "Eco-Tourism & Sustainable Travel",
+                        "Logistics & Ground Handling",
+                      ].map((item, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                          <span className="text-gray-700">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="w-full flex flex-col items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-2 flex-wrap">
+                      {tourismImages.length > 1 && (
+                        <button
+                          aria-label="Previous Tourism Image"
+                          onClick={() => setTourismImgIdx((tourismImgIdx - 1 + tourismImages.length) % tourismImages.length)}
+                          className="p-2 rounded-full bg-gray-200 hover:bg-green-200 transition-colors"
+                        >
+                          <ChevronLeft className="h-5 w-5 text-green-600" />
+                        </button>
+                      )}
+                      <Image
+                        src={tourismImages[tourismImgIdx]}
+                        alt="Tourism service"
+                        width={420}
+                        height={260}
+                        className="rounded-lg shadow-lg w-full lg:w-full lg:max-w-none"
+                        style={{ height: 'auto' }}
+                      />
+                      {tourismImages.length > 1 && (
+                        <button
+                          aria-label="Next Tourism Image"
+                          onClick={() => setTourismImgIdx((tourismImgIdx + 1) % tourismImages.length)}
+                          className="p-2 rounded-full bg-gray-200 hover:bg-green-200 transition-colors"
+                        >
+                          <ChevronRight className="h-5 w-5 text-green-600" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </TabsContent>
