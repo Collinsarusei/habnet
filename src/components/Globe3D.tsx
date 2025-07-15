@@ -116,8 +116,8 @@ export default function Globe3D({ width = 520 }: { width?: number }) {
           }, REASSEMBLE_DURATION);
         }, 1800);
       }, BURST_DURATION);
-    } else {
-      // Cycle images
+    } else if (!showText && !reassembling) {
+      // Cycle images continuously except during burst/reassemble overlay
       timeoutRef.current = setTimeout(() => {
         if (imageIndex < images.length - 1) {
           setImageIndex(imageIndex + 1);
@@ -127,7 +127,7 @@ export default function Globe3D({ width = 520 }: { width?: number }) {
       }, IMAGE_DISPLAY_TIME);
     }
     return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
-  }, [imageIndex, bursting, reassembling]);
+  }, [imageIndex, bursting, reassembling, showText]);
 
   // Update globe texture on imageIndex change
   useEffect(() => {
@@ -184,7 +184,7 @@ export default function Globe3D({ width = 520 }: { width?: number }) {
       <div className="pointer-events-none select-none absolute top-1/2 left-1/2 z-30" style={{ transform: `translate(-50%, -50%)` }}>
         <svg width={width + 40} height={width + 40} viewBox={`0 0 ${width + 40} ${width + 40}`} style={{ position: 'absolute', top: 0, left: 0 }}>
           <defs>
-            <path id="circlePathTop" d="M ${(width + 40) / 2},${30} a${(width + 40) / 2 - 30},${(width + 40) / 2 - 30} 0 1,1 0.01,0" />
+            <path id="circlePathTop" d={`M ${(width + 40) / 2},${30} a${(width + 40) / 2 - 30},${(width + 40) / 2 - 30} 0 1,1 0.01,0`} />
           </defs>
           <text fill="#2563eb" fontSize="18" fontWeight="bold" letterSpacing="1.5">
             <textPath xlinkHref="#circlePathTop" startOffset="50%" textAnchor="middle" dominantBaseline="middle">

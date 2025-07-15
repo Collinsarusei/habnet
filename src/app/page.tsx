@@ -223,15 +223,29 @@ export default function HabnetSolutions() {
     }
   }, []);
 
-  // Add state for image navigation in Travel Agency and Tourism tabs
-  const [tourismImgIdx, setTourismImgIdx] = useState(0);
+  // Travel Agency images: only travel1 and travel2, auto-cycle
+  const travelImages = ["/images/travel1.jpg", "/images/travel2.jpeg"];
+  const [travelImgIdx, setTravelImgIdx] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTravelImgIdx((prev) => (prev + 1) % travelImages.length);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [travelImages.length]);
+
+  // Tourism images: only safari images, auto-cycle
   const tourismImages = [
     "/images/safari1.jpg",
     "/images/safari2.jpeg",
     "/images/safari3.jpeg",
-    "/images/travel1.jpg",
-    "/images/travel2.jpeg",
   ];
+  const [tourismImgIdx, setTourismImgIdx] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTourismImgIdx((prev) => (prev + 1) % tourismImages.length);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [tourismImages.length]);
 
   // Add state and image arrays for all service tabs
   const [generalImgIdx, setGeneralImgIdx] = useState(0);
@@ -1018,7 +1032,7 @@ export default function HabnetSolutions() {
                   </div>
                   <div className="w-full flex flex-col items-center justify-center gap-2">
                     <Image
-                      src="/images/travel1.jpg"
+                      src={travelImages[travelImgIdx]}
                       alt="Travel agency service"
                       width={420}
                       height={260}
@@ -1059,15 +1073,6 @@ export default function HabnetSolutions() {
                   </div>
                   <div className="w-full flex flex-col items-center justify-center gap-2">
                     <div className="flex items-center justify-center gap-2 flex-wrap">
-                      {tourismImages.length > 1 && (
-                        <button
-                          aria-label="Previous Tourism Image"
-                          onClick={() => setTourismImgIdx((tourismImgIdx - 1 + tourismImages.length) % tourismImages.length)}
-                          className="p-2 rounded-full bg-gray-200 hover:bg-green-200 transition-colors"
-                        >
-                          <ChevronLeft className="h-5 w-5 text-green-600" />
-                        </button>
-                      )}
                       <Image
                         src={tourismImages[tourismImgIdx]}
                         alt="Tourism service"
@@ -1076,15 +1081,6 @@ export default function HabnetSolutions() {
                         className="rounded-lg shadow-lg w-full lg:w-full lg:max-w-none"
                         style={{ height: 'auto' }}
                       />
-                      {tourismImages.length > 1 && (
-                        <button
-                          aria-label="Next Tourism Image"
-                          onClick={() => setTourismImgIdx((tourismImgIdx + 1) % tourismImages.length)}
-                          className="p-2 rounded-full bg-gray-200 hover:bg-green-200 transition-colors"
-                        >
-                          <ChevronRight className="h-5 w-5 text-green-600" />
-                        </button>
-                      )}
                     </div>
                   </div>
                 </div>
