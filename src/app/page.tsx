@@ -31,6 +31,7 @@ import {
   ChevronUp,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
 } from "lucide-react"
 import Image from "next/image"
 import emailjs from 'emailjs-com'
@@ -38,7 +39,8 @@ import Globe3D from '@/components/Globe3D';
 
 export default function HabnetSolutions() {
   // State for mobile menu toggle
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState<false | 'services'>(false);
   // State for active service tab
   const [activeTab, setActiveTab] = useState("general-supply")
   // State for scroll position to show/hide back to top button
@@ -113,7 +115,7 @@ export default function HabnetSolutions() {
     const element = document.getElementById(sectionId)
     if (element) {
       element.scrollIntoView({ behavior: "smooth" })
-      setIsMenuOpen(false) // Close mobile menu after navigation
+      setIsMobileMenuOpen(false) // Close mobile menu after navigation
     }
   }
 
@@ -277,18 +279,15 @@ export default function HabnetSolutions() {
                 className="rounded-md object-cover"
                 style={{ objectPosition: 'center 15%', transform: 'scale(1.3)', height: 'auto' }}
               />
-              <h1 className="text-xl font-bold text-blue-900 cursor-pointer" onClick={() => scrollToSection("hero")}>
-                HABNET SOLUTIONS LIMITED
-              </h1>
+              <h1 className="text-xl font-bold text-blue-900 cursor-pointer" onClick={() => scrollToSection("hero")}>HABNET SOLUTIONS LIMITED</h1>
             </div>
 
             {/* Desktop Navigation Links */}
             <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-4">
+              <div className="ml-10 flex items-baseline space-x-4 relative">
                 {[
                   { name: "Home", id: "hero" },
                   { name: "About Us", id: "about" },
-                  { name: "Services", id: "services" },
                   { name: "Core Values", id: "values" },
                   { name: "Contact Us", id: "contact" },
                 ].map((item) => (
@@ -300,6 +299,48 @@ export default function HabnetSolutions() {
                     {item.name}
                   </button>
                 ))}
+                {/* Services Dropdown */}
+                <div className="relative group" onMouseEnter={() => setIsMenuOpen('services')} onMouseLeave={() => setIsMenuOpen(false)}>
+                  <button
+                    className="text-gray-700 hover:text-blue-600 px-2 py-2 text-sm font-medium transition-colors duration-200 hover:bg-blue-50 rounded-md flex items-center"
+                    onClick={() => setIsMenuOpen(isMenuOpen === 'services' ? false : 'services')}
+                    aria-haspopup="true"
+                    aria-expanded={isMenuOpen === 'services'}
+                  >
+                    Our Services
+                    <ChevronDown className="ml-1 h-4 w-4" />
+                  </button>
+                  <div
+                    className={`absolute left-0 mt-2 w-56 bg-white/90 backdrop-blur-lg shadow-xl rounded-lg border border-blue-100 z-50 transition-opacity duration-200 ${isMenuOpen === 'services' ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+                    onMouseEnter={() => setIsMenuOpen('services')}
+                    onMouseLeave={() => setIsMenuOpen(false)}
+                  >
+                    <ul className="py-2">
+                      {[
+                        { label: "General Supply", tab: "general-supply" },
+                        { label: "Food Supply", tab: "food-supply" },
+                        { label: "Construction", tab: "construction" },
+                        { label: "Road Works", tab: "road-construction" },
+                        { label: "Water & Sewerage", tab: "borehole" },
+                        { label: "Materials", tab: "materials" },
+                        { label: "Travel Agency Services", tab: "travel-agency" },
+                        { label: "Tourism Services", tab: "tourism" },
+                      ].map((service) => (
+                        <li key={service.tab}>
+                          <button
+                            onClick={() => {
+                              setActiveTab(service.tab);
+                              scrollToSection("services");
+                            }}
+                            className="w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150 text-sm"
+                          >
+                            {service.label}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
                 <Link href="/legal-documents">
                   <button className="text-gray-700 hover:text-blue-600 px-2 py-2 text-sm font-medium transition-colors duration-200 hover:bg-blue-50 rounded-md">
                     Legal Documents
@@ -315,31 +356,65 @@ export default function HabnetSolutions() {
 
             {/* Mobile menu button */}
             <div className="md:hidden">
-              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-700 hover:text-blue-600 p-2">
-                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-700 hover:text-blue-600 p-2">
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
             </div>
           </div>
 
           {/* Mobile Navigation Menu */}
-          {isMenuOpen && (
-            <div className="md:hidden bg-white border-t border-gray-200">
+          {isMobileMenuOpen && (
+            <div className="md:hidden bg-white/40 backdrop-blur-2xl border-t border-blue-200 shadow-2xl rounded-b-xl transition-all duration-300">
               <div className="px-2 pt-2 pb-3 space-y-1">
                 {[
                   { name: "Home", id: "hero" },
                   { name: "About Us", id: "about" },
-                  { name: "Services", id: "services" },
                   { name: "Core Values", id: "values" },
                   { name: "Contact Us", id: "contact" },
                 ].map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => scrollToSection(item.id)}
+                    onClick={() => {
+                      scrollToSection(item.id);
+                      setIsMobileMenuOpen(false);
+                    }}
                     className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium w-full text-left transition-colors duration-200 hover:bg-blue-50 rounded-md"
                   >
                     {item.name}
                   </button>
                 ))}
+                {/* Expandable Services */}
+                <details className="mb-2">
+                  <summary className="flex items-center text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium w-full text-left rounded-md cursor-pointer select-none">
+                    Our Services
+                    <ChevronDown className="ml-2 h-5 w-5 inline-block" />
+                  </summary>
+                  <ul className="pl-4 mt-2 space-y-1">
+                    {[
+                      { label: "General Supply", tab: "general-supply" },
+                      { label: "Food Supply", tab: "food-supply" },
+                      { label: "Construction", tab: "construction" },
+                      { label: "Road Works", tab: "road-construction" },
+                      { label: "Water & Sewerage", tab: "borehole" },
+                      { label: "Materials", tab: "materials" },
+                      { label: "Travel Agency Services", tab: "travel-agency" },
+                      { label: "Tourism Services", tab: "tourism" },
+                    ].map((service) => (
+                      <li key={service.tab}>
+                        <button
+                          onClick={() => {
+                            setActiveTab(service.tab);
+                            scrollToSection("services");
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className="w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150 text-base"
+                        >
+                          {service.label}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
                 <Link href="/legal-documents">
                   <button className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium w-full text-left transition-colors duration-200 hover:bg-blue-50 rounded-md">
                     Legal Documents
@@ -549,7 +624,14 @@ export default function HabnetSolutions() {
               relationship based on mutual trust in order to bring the best services possible to our clients.
             </p>
             <p className="text-base md:text-lg text-blue-700 font-semibold mt-4 mb-2 max-w-2xl mx-auto">
-              We are recognized internationally. <span className="underline cursor-pointer">See our Global Reach page.</span>
+              We are recognized internationally.{' '}
+              <button
+                type="button"
+                onClick={() => scrollToSection('global-reach')}
+                className="text-blue-600 underline hover:text-blue-800 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                See our Global Reach page.
+              </button>
             </p>
           </div>
 
@@ -1116,20 +1198,62 @@ export default function HabnetSolutions() {
         </div>
       </section>
 
-      {/* Contact Us Section - Contact information and form */}
-      <section id="contact" className="py-20 bg-gray-50">
+      {/* Global Reach Section */}
+      <section id="global-reach" className="py-20 bg-gradient-to-br from-blue-50 via-white to-blue-100 animate-on-scroll">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16 animate-on-scroll">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h2>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-blue-900 mb-4">Our Global Reach</h2>
             <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
-            <p className="text-xl text-gray-600 mt-6">Get in touch with us for all your business needs</p>
+            <p className="text-xl text-gray-700 mt-6 max-w-2xl mx-auto">
+              Habnet Solutions Limited has travelled the globe for business, forging international partnerships and earning recognition for excellence. Our team’s global exposure ensures we bring world-class solutions to every project.
+            </p>
+            <p className="text-lg text-gray-600 mt-4 max-w-3xl mx-auto">
+              From Africa to Europe and beyond, our professionals have attended international business summits, signed cross-border contracts, and delivered on projects that require a deep understanding of global standards. Our recognition by international partners and organizations is a testament to our commitment to quality, innovation, and reliability. We believe that every journey abroad brings new insights, which we channel into better solutions for our clients at home and worldwide.
+            </p>
           </div>
+          <div className="grid md:grid-cols-3 gap-8 items-center">
+            <div className="flex flex-col gap-6">
+              <Image src="/images/businesstrip.jpeg" alt="Business Trip" width={400} height={260} className="rounded-xl shadow-xl object-cover" />
+              <Image src="/images/recognition.jpeg" alt="Recognition" width={400} height={260} className="rounded-xl shadow-lg object-cover" />
+            </div>
+            <div className="flex flex-col gap-6">
+              <Image src="/images/global1.jpeg" alt="Global 1" width={400} height={260} className="rounded-xl shadow-lg object-cover" />
+              <Image src="/images/global2.jpeg" alt="Global 2" width={400} height={260} className="rounded-xl shadow-lg object-cover" />
+            </div>
+            <div className="flex flex-col gap-6 items-center justify-center">
+              <Image src="/images/ceo1.jpeg" alt="CEO on Business" width={320} height={320} className="rounded-full shadow-2xl object-cover border-4 border-blue-200" />
+              <div className="bg-white/80 rounded-lg p-6 shadow-lg mt-4">
+                <h3 className="text-xl font-bold text-blue-900 mb-2">International Experience</h3>
+                <p className="text-gray-700">Our leadership and team have represented Habnet Solutions Limited in various countries, building a reputation for reliability and innovation on a global scale.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
+      {/* CEO Section */}
+      <section id="ceo" className="py-16 bg-white animate-on-scroll">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-10">
+          <Image src="/images/ceo2.jpeg" alt="CEO Abraham Rono" width={320} height={320} className="rounded-2xl shadow-2xl object-cover border-4 border-orange-200" />
+          <div className="bg-orange-50/80 rounded-xl p-8 shadow-lg mt-6 md:mt-0">
+            <h3 className="text-2xl font-bold text-orange-800 mb-2">Meet Our CEO Abraham Rono</h3>
+            <p className="text-gray-700 text-lg">Abraham Rono leads Habnet Solutions Limited with vision, integrity, and a passion for excellence. With a wealth of international experience, Abraham has steered the company to new heights, ensuring every client receives world-class service and innovative solutions.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Us Section - Contact information and form */}
+      <section id="contact" className="py-20 bg-gradient-to-br from-blue-100 via-white to-blue-200 animate-on-scroll">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-blue-900 mb-4">Contact Us</h2>
+            <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
+            <p className="text-xl text-gray-700 mt-6">Get in touch with us for all your business needs</p>
+          </div>
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Contact Information */}
             <div className="animate-on-scroll">
-              <h3 className="text-2xl font-bold text-gray-900 mb-8">Get In Touch</h3>
-
+              <h3 className="text-2xl font-bold text-blue-900 mb-8">Get In Touch</h3>
               <div className="space-y-6">
                 {/* Address */}
                 <div className="flex items-start space-x-4">
@@ -1137,51 +1261,45 @@ export default function HabnetSolutions() {
                     <MapPin className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Address</h4>
-                    <p className="text-gray-600">
-                      MBARIA COMPLEX, KENYATTA AVENUE
-                      <br />
-                      NYAHURURU DISTRICT, NYAHURURU
+                    <h4 className="font-semibold text-blue-900 mb-1">Address</h4>
+                    <p className="text-gray-700">
+                      MBARIA COMPLEX, KENYATTA AVENUE<br />NYAHURURU DISTRICT, NYAHURURU
                     </p>
                   </div>
                 </div>
-
                 {/* P.O. Box */}
                 <div className="flex items-start space-x-4">
                   <div className="bg-blue-100 p-3 rounded-full">
                     <Mail className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">P.O. Box</h4>
-                    <p className="text-gray-600">P.O. BOX 117 - 20322, Rumuruti</p>
+                    <h4 className="font-semibold text-blue-900 mb-1">P.O. Box</h4>
+                    <p className="text-gray-700">P.O. BOX 117 - 20322, Rumuruti</p>
                   </div>
                 </div>
-
                 {/* Phone */}
                 <div className="flex items-start space-x-4">
                   <div className="bg-blue-100 p-3 rounded-full">
                     <Phone className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Phone</h4>
-                    <p className="text-gray-600">+254 725 171365</p>
+                    <h4 className="font-semibold text-blue-900 mb-1">Phone</h4>
+                    <p className="text-gray-700">+254 725 171365</p>
                   </div>
                 </div>
-
                 {/* Email */}
                 <div className="flex items-start space-x-4">
                   <div className="bg-blue-100 p-3 rounded-full">
                     <Mail className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Email</h4>
-                    <p className="text-gray-600">habnetsolutions@gmail.com</p>
+                    <h4 className="font-semibold text-blue-900 mb-1">Email</h4>
+                    <p className="text-gray-700">habnetsolutions@gmail.com</p>
                   </div>
                 </div>
               </div>
-
               {/* Map placeholder */}
-              <div className="mt-8 w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
+              <div className="mt-8 w-full rounded-xl overflow-hidden shadow-2xl border border-blue-200">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4041.7681977584602!2d36.361808075023816!3d0.03785099996177981!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x17876308baab956f%3A0x5e0facba00ca525d!2sMbaria%20Complex%20Building!5e1!3m2!1sen!2ske!4v1752470382768!5m2!1sen!2ske"
                   width="100%"
@@ -1194,12 +1312,11 @@ export default function HabnetSolutions() {
                 ></iframe>
               </div>
             </div>
-
             {/* Contact Form */}
             <div className="animate-on-scroll">
-              <Card className="bg-white shadow-xl">
+              <Card className="bg-white/80 shadow-2xl rounded-2xl backdrop-blur-lg border border-blue-100">
                 <CardHeader>
-                  <CardTitle className="text-2xl text-gray-900">Send Us a Message</CardTitle>
+                  <CardTitle className="text-2xl text-blue-900">Send Us a Message</CardTitle>
                   <CardDescription>
                     Fill out the form below and we&apos;ll get back to you as soon as possible.
                   </CardDescription>
@@ -1208,7 +1325,7 @@ export default function HabnetSolutions() {
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="name" className="block text-sm font-medium text-blue-900 mb-2">
                           Name *
                         </label>
                         <Input
@@ -1218,12 +1335,12 @@ export default function HabnetSolutions() {
                           required
                           value={formData.name}
                           onChange={handleInputChange}
-                          className="w-full"
+                          className="w-full rounded-lg bg-blue-50/60 border border-blue-200 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 shadow-sm"
                           placeholder="Your full name"
                         />
                       </div>
                       <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="email" className="block text-sm font-medium text-blue-900 mb-2">
                           Email *
                         </label>
                         <Input
@@ -1233,14 +1350,13 @@ export default function HabnetSolutions() {
                           required
                           value={formData.email}
                           onChange={handleInputChange}
-                          className="w-full"
+                          className="w-full rounded-lg bg-blue-50/60 border border-blue-200 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 shadow-sm"
                           placeholder="your.email@example.com"
                         />
                       </div>
                     </div>
-
                     <div>
-                      <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="subject" className="block text-sm font-medium text-blue-900 mb-2">
                         Subject *
                       </label>
                       <Input
@@ -1250,13 +1366,12 @@ export default function HabnetSolutions() {
                         required
                         value={formData.subject}
                         onChange={handleInputChange}
-                        className="w-full"
+                        className="w-full rounded-lg bg-blue-50/60 border border-blue-200 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 shadow-sm"
                         placeholder="What is this regarding?"
                       />
                     </div>
-
                     <div>
-                      <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="message" className="block text-sm font-medium text-blue-900 mb-2">
                         Message *
                       </label>
                       <Textarea
@@ -1266,14 +1381,13 @@ export default function HabnetSolutions() {
                         value={formData.message}
                         onChange={handleInputChange}
                         rows={5}
-                        className="w-full"
+                        className="w-full rounded-lg bg-blue-50/60 border border-blue-200 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 shadow-sm"
                         placeholder="Tell us more about your requirements..."
                       />
                     </div>
-
                     <Button
                       type="submit"
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg transition-all duration-300 transform hover:scale-105"
+                      className="w-full bg-gradient-to-r from-orange-500 via-blue-500 to-purple-600 hover:from-purple-600 hover:to-orange-500 text-white py-3 text-lg rounded-lg transition-all duration-300 transform hover:scale-105 shadow-xl font-bold border-2 border-white"
                     >
                       Send Message
                       <ArrowRight className="ml-2 h-5 w-5" />

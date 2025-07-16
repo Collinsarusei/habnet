@@ -4,7 +4,7 @@ import type React from "react"
 import { useState } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { ArrowLeft, FileText, Shield, Building, Award } from "lucide-react"
 import Link from "next/link"
 
@@ -100,9 +100,9 @@ export default function LegalDocuments() {
                 </Button>
               </Link>
             </div>
-            <div className="text-center">
-              <h1 className="text-3xl font-bold text-gray-900">Legal Documents & Certificates</h1>
-              <p className="text-gray-600 mt-2">Official certifications and compliance documents</p>
+            <div className="flex flex-col items-center flex-1">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 text-center w-full break-words">Legal Documents & Certificates</h1>
+              <p className="text-gray-600 mt-2 text-center">Official certifications and compliance documents</p>
             </div>
             <div className="w-24"></div> {/* Spacer for centering */}
           </div>
@@ -134,42 +134,43 @@ export default function LegalDocuments() {
           </div>
         </div>
 
-        {/* Documents Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Documents Grid - Responsive for Mobile */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredDocuments.map((document) => (
             <Card
               key={document.id}
-              className="hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+              className="hover:shadow-lg transition-shadow duration-300 cursor-pointer md:flex md:flex-col"
               onClick={() => setSelectedDocument(document.id)}
             >
-              <CardHeader className="text-center">
-                <div className="mx-auto bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
+              <div className="flex items-center md:block p-2 md:p-0">
+                <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mr-4 md:mx-auto md:mb-4 md:mr-0">
                   {document.category === "Construction Authority" && <Building className="h-8 w-8 text-blue-600" />}
                   {document.category === "Business Registration" && <Award className="h-8 w-8 text-blue-600" />}
                   {document.category === "Tax Compliance" && <Shield className="h-8 w-8 text-blue-600" />}
                   {document.category === "Corporate Law" && <FileText className="h-8 w-8 text-blue-600" />}
                 </div>
-                <CardTitle className="text-lg text-gray-900">{document.title}</CardTitle>
-                <CardDescription className="text-sm">{document.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                  <Image
-                    src={document.image}
-                    alt={document.title}
-                    fill
-                    className="object-cover hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      e.currentTarget.src = "/images/logo.jpeg"
-                    }}
-                  />
-                </div>
-                <div className="mt-4">
-                  <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                <div className="flex-1 md:text-center">
+                  <div className="font-bold text-gray-900 text-base md:text-lg truncate">{document.title}</div>
+                  <div className="text-xs text-gray-500 md:text-sm truncate">{document.description}</div>
+                  <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mt-1 md:mt-4">
                     {document.category}
                   </span>
                 </div>
-              </CardContent>
+                <div className="hidden md:block mt-4">
+                  <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                    <Image
+                      src={document.image}
+                      alt={document.title}
+                      fill
+                      className="object-cover hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        e.currentTarget.src = "/images/logo.jpeg"
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+              {/* Show image only on desktop, not on mobile for compactness */}
             </Card>
           ))}
         </div>
