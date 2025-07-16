@@ -527,14 +527,14 @@ export default function HabnetSolutions() {
             {/* About Image */}
             <div className="animate-on-scroll">
               <Image
-                src="/images/about_pcture.jpeg"
-                alt="Professional team collaboration representing trust and teamwork"
+                src="/images/about2.jpeg"
+                alt="Global business presence"
                 width={500}
                 height={400}
                 className="rounded-lg shadow-xl"
                 style={{ height: 'auto' }}
                 onError={(e) => {
-                  e.currentTarget.src = "/images/about_pcture.jpeg"
+                  e.currentTarget.src = "/images/global2.jpeg"
                 }}
               />
             </div>
