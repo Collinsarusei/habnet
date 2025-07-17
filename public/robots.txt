@@ -1,0 +1,56 @@
+# Robots.txt for HABNET SOLUTIONS LIMITED
+# This file tells search engine crawlers which pages they can and cannot access
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://your-domain.com/sitemap.xml
+
+# Crawl delay (optional - helps prevent server overload)
+Crawl-delay: 1
+
+# Block access to admin areas (if any)
+Disallow: /admin/
+Disallow: /private/
+Disallow: /_next/
+Disallow: /api/
+
+# Allow access to important pages
+Allow: /
+Allow: /about
+Allow: /services
+Allow: /contact
+
+# Block common bot traps
+Disallow: /cgi-bin/
+Disallow: /tmp/
+Disallow: /temp/
+
+# Google-specific directives
+User-agent: Googlebot
+Allow: /
+
+# Bing-specific directives  
+User-agent: Bingbot
+Allow: /
+
+# Block bad bots (optional)
+User-agent: BadBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+# Allow social media crawlers
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /

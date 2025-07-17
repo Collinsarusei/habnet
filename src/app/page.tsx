@@ -127,49 +127,37 @@ export default function HabnetSolutions() {
     })
   }
 
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    // Show loading state
-    const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement
-    const originalText = submitButton.innerHTML
-    submitButton.innerHTML = 'Sending...'
-    submitButton.disabled = true
-    
-    // EmailJS configuration
-    const templateParams = {
-      from_name: formData.name,
-      from_email: formData.email,
-      subject: formData.subject,
-      message: formData.message,
-      to_email: 'habnetsolutions@gmail.com', // Company email
-      company_name: 'Habnet Solutions Limited'
+  // Handle form submission (Resend API)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
+    const originalText = submitButton.innerHTML;
+    submitButton.innerHTML = 'Sending...';
+    submitButton.disabled = true;
+    try {
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        }),
+      });
+      if (response.ok) {
+        setFormData({ name: '', email: '', subject: '', message: '' });
+        alert('Thank you for your message! We have received it and will get back to you soon.');
+      } else {
+        const data = await response.json();
+        alert(data.error || 'There was an error sending your message. Please try again or contact us directly at habnetsolutions@gmail.com');
+      }
+    } catch {
+      alert('There was an error sending your message. Please try again or contact us directly at habnetsolutions@gmail.com');
+    } finally {
+      submitButton.innerHTML = originalText;
+      submitButton.disabled = false;
     }
-    
-    // Send email using EmailJS
-    emailjs.send(
-      'YOUR_SERVICE_ID', // TODO: Replace with your EmailJS service ID
-      'YOUR_TEMPLATE_ID', // TODO: Replace with your EmailJS template ID
-      templateParams,
-      'YOUR_USER_ID' // TODO: Replace with your EmailJS user ID
-    )
-    .then((response) => {
-      console.log('SUCCESS!', response.status, response.text)
-      // Reset form
-      setFormData({ name: "", email: "", subject: "", message: "" })
-      // Show success message
-      alert("Thank you for your message! We have received it and will get back to you soon.")
-    })
-    .catch((error) => {
-      console.error('FAILED...', error)
-      alert("There was an error sending your message. Please try again or contact us directly at habnetsolutions@gmail.com")
-    })
-    .finally(() => {
-      // Reset button state
-      submitButton.innerHTML = originalText
-      submitButton.disabled = false
-    })
   }
 
   // Core values data with icons
