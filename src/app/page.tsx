@@ -2,7 +2,8 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
+import { motion } from "framer-motion"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,10 +33,17 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react"
 import Image from "next/image"
-import emailjs from 'emailjs-com'
-import Globe3D from '@/components/Globe3D';
+import dynamic from 'next/dynamic'
+
+// Dynamically import heavy components
+const Globe3D = dynamic(() => import('@/components/Globe3D'), {
+  ssr: false,
+  loading: () => <div className="w-full h-64 bg-gray-100 rounded-lg animate-pulse" />
+})
 
 export default function HabnetSolutions() {
   // State for mobile menu toggle
@@ -52,18 +60,22 @@ export default function HabnetSolutions() {
     subject: "",
     message: "",
   })
+  // State for toast notifications
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
 
 
 
   // Hero background slideshow images (excluding logo.jpeg and about_pcture.jpeg)
-  const heroImages = [
-    "/images/hero_background.jpeg",
-    "/images/constructin_materials.jpg",
-    "/images/borehole drilling.jpg",
-    "/images/construction.jpg",
-    "/images/road construction.jpg",
-    "/images/food.jpg",
-  ];
+  const heroImages = useMemo(() => [
+    "/images/optimized/hero_background.webp",
+    "/images/optimized/constructin_materials.webp",
+    "/images/optimized/borehole drilling.webp",
+    "/images/optimized/construction.webp",
+    "/images/optimized/road construction.webp",
+    "/images/optimized/food.webp",
+  ], []);
   const [heroBgIndex, setHeroBgIndex] = useState(0);
 
   // Animate hero background
@@ -74,32 +86,31 @@ export default function HabnetSolutions() {
     return () => clearInterval(interval);
   }, [heroImages.length]);
 
+  // Optimized scroll handler with useCallback
+  const handleScroll = useCallback(() => {
+    // Show back to top button when scrolled down
+    setShowBackToTop(window.scrollY > 300)
+
+    // Animate elements on scroll - with error handling
+    try {
+      const elements = document.querySelectorAll(".animate-on-scroll")
+      elements.forEach((element) => {
+        if (element && element.getBoundingClientRect) {
+          const elementTop = element.getBoundingClientRect().top
+          const elementVisible = 150
+
+          if (elementTop < window.innerHeight - elementVisible) {
+            element.classList.add("animate-fade-in-up")
+          }
+        }
+      })
+    } catch (error) {
+      console.log("Animation error:", error)
+    }
+  }, [])
+
   // Handle scroll events for animations and back to top button
   useEffect(() => {
-    // Initialize EmailJS
-    emailjs.init('YOUR_USER_ID') // TODO: Replace with your EmailJS user ID
-    
-    const handleScroll = () => {
-      // Show back to top button when scrolled down
-      setShowBackToTop(window.scrollY > 300)
-
-      // Animate elements on scroll - with error handling
-      try {
-        const elements = document.querySelectorAll(".animate-on-scroll")
-        elements.forEach((element) => {
-          if (element && element.getBoundingClientRect) {
-            const elementTop = element.getBoundingClientRect().top
-            const elementVisible = 150
-
-            if (elementTop < window.innerHeight - elementVisible) {
-              element.classList.add("animate-fade-in-up")
-            }
-          }
-        })
-      } catch (error) {
-        console.log("Animation error:", error)
-      }
-    }
 
     // Add scroll listener with passive option for better performance
     window.addEventListener("scroll", handleScroll, { passive: true })
@@ -108,7 +119,7 @@ export default function HabnetSolutions() {
     handleScroll()
 
     return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+  }, [handleScroll])
 
   // Smooth scroll to section function
   const scrollToSection = (sectionId: string) => {
@@ -126,6 +137,14 @@ export default function HabnetSolutions() {
       [e.target.name]: e.target.value,
     })
   }
+
+  // Show notification function
+  const showNotification = (message: string, type: 'success' | 'error') => {
+    setToastMessage(message);
+    setToastType(type);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 5000);
+  };
 
   // Handle form submission (Resend API)
   const handleSubmit = async (e: React.FormEvent) => {
@@ -147,21 +166,21 @@ export default function HabnetSolutions() {
       });
       if (response.ok) {
         setFormData({ name: '', email: '', subject: '', message: '' });
-        alert('Thank you for your message! We have received it and will get back to you soon.');
+        showNotification('Thank you for your message! We have received it and will get back to you soon.', 'success');
       } else {
         const data = await response.json();
-        alert(data.error || 'There was an error sending your message. Please try again or contact us directly at habnetsolutions@gmail.com');
+        showNotification(data.error || 'There was an error sending your message. Please try again or contact us directly at habnetsolutionslimited@gmail.com', 'error');
       }
     } catch {
-      alert('There was an error sending your message. Please try again or contact us directly at habnetsolutions@gmail.com');
+      showNotification('There was an error sending your message. Please try again or contact us directly at habnetsolutionslimited@gmail.com', 'error');
     } finally {
       submitButton.innerHTML = originalText;
       submitButton.disabled = false;
     }
   }
 
-  // Core values data with icons
-  const coreValues = [
+  // Core values data with icons - memoized for performance
+  const coreValues = useMemo(() => [
     {
       icon: Shield,
       title: "Quality, Health, Safety & Environment",
@@ -192,10 +211,10 @@ export default function HabnetSolutions() {
       title: "Financial Responsibility",
       description: "Financial Responsibility to our stakeholders",
     },
-  ]
+  ], [])
 
-  // Service tab values in order
-  const serviceTabs = [
+  // Service tab values in order - memoized for performance
+  const serviceTabs = useMemo(() => [
     "general-supply",
     "food-supply",
     "construction",
@@ -204,12 +223,17 @@ export default function HabnetSolutions() {
     "materials",
     "travel-agency",
     "tourism",
-  ];
+  ], []);
 
   const [globeWidth, setGlobeWidth] = useState(420);
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setGlobeWidth(Math.min(window.innerWidth - 32, 420));
+      const updateGlobeWidth = () => {
+        setGlobeWidth(Math.min(window.innerWidth - 32, 420));
+      };
+      updateGlobeWidth();
+      window.addEventListener('resize', updateGlobeWidth);
+      return () => window.removeEventListener('resize', updateGlobeWidth);
     }
   }, []);
 
@@ -258,21 +282,26 @@ export default function HabnetSolutions() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Company Logo/Name */}
-            <div className="flex-shrink-0 flex items-center space-x-3">
+            <div className="flex-shrink-0 flex items-center space-x-2 sm:space-x-3">
               <Image
                 src="/images/logo.jpeg?v=2"
                 alt="Habnet Solutions Logo"
-                width={40}
-                height={40}
-                className="rounded-md object-cover"
-                style={{ objectPosition: 'center 15%', transform: 'scale(1.3)', height: 'auto' }}
+                width={28}
+                height={28}
+                className="rounded-lg object-cover sm:w-8 sm:h-8 md:w-10 md:h-10 shadow-sm"
+                style={{ objectPosition: 'center 15%', transform: 'scale(1.1)', height: 'auto' }}
+                priority
+                sizes="(max-width: 640px) 28px, (max-width: 768px) 32px, 40px"
               />
-              <h1 className="text-xl font-bold text-blue-900 cursor-pointer" onClick={() => scrollToSection("hero")}>HABNET SOLUTIONS LIMITED</h1>
+              <h1 className="text-sm sm:text-lg md:text-xl font-bold text-blue-900 cursor-pointer" onClick={() => scrollToSection("hero")}>
+                <span className="hidden sm:inline">HABNET SOLUTIONS LIMITED</span>
+                <span className="sm:hidden">HABNET</span>
+              </h1>
             </div>
 
             {/* Desktop Navigation Links */}
             <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-4 relative">
+              <div className="ml-6 lg:ml-10 flex items-baseline space-x-2 lg:space-x-4 relative">
                 {[
                   { name: "Home", id: "hero" },
                   { name: "About Us", id: "about" },
@@ -282,7 +311,7 @@ export default function HabnetSolutions() {
                   <button
                     key={item.id}
                     onClick={() => scrollToSection(item.id)}
-                    className="text-gray-700 hover:text-blue-600 px-2 py-2 text-sm font-medium transition-colors duration-200 hover:bg-blue-50 rounded-md"
+                    className="text-gray-700 hover:text-blue-600 px-2 py-2 text-xs lg:text-sm font-medium transition-colors duration-200 hover:bg-blue-50 rounded-md"
                   >
                     {item.name}
                   </button>
@@ -290,13 +319,14 @@ export default function HabnetSolutions() {
                 {/* Services Dropdown */}
                 <div className="relative group" onMouseEnter={() => setIsMenuOpen('services')} onMouseLeave={() => setIsMenuOpen(false)}>
                   <button
-                    className="text-gray-700 hover:text-blue-600 px-2 py-2 text-sm font-medium transition-colors duration-200 hover:bg-blue-50 rounded-md flex items-center"
+                    className="text-gray-700 hover:text-blue-600 px-2 py-2 text-xs lg:text-sm font-medium transition-colors duration-200 hover:bg-blue-50 rounded-md flex items-center"
                     onClick={() => setIsMenuOpen(isMenuOpen === 'services' ? false : 'services')}
                     aria-haspopup="true"
                     aria-expanded={isMenuOpen === 'services'}
                   >
-                    Our Services
-                    <ChevronDown className="ml-1 h-4 w-4" />
+                    <span className="hidden lg:inline">Our Services</span>
+                    <span className="lg:hidden">Services</span>
+                    <ChevronDown className="ml-1 h-3 w-3 lg:h-4 lg:w-4" />
                   </button>
                   <div
                     className={`absolute left-0 mt-2 w-56 bg-white/90 backdrop-blur-lg shadow-xl rounded-lg border border-blue-100 z-50 transition-opacity duration-200 ${isMenuOpen === 'services' ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
@@ -330,13 +360,15 @@ export default function HabnetSolutions() {
                   </div>
                 </div>
                 <Link href="/legal-documents">
-                  <button className="text-gray-700 hover:text-blue-600 px-2 py-2 text-sm font-medium transition-colors duration-200 hover:bg-blue-50 rounded-md">
-                    Legal Documents
+                  <button className="text-gray-700 hover:text-blue-600 px-2 py-2 text-xs lg:text-sm font-medium transition-colors duration-200 hover:bg-blue-50 rounded-md">
+                    <span className="hidden lg:inline">Legal Documents</span>
+                    <span className="lg:hidden">Legal</span>
                   </button>
                 </Link>
                 <Link href="/project-structure">
-                  <button className="text-gray-700 hover:text-blue-600 px-2 py-2 text-sm font-medium transition-colors duration-200 hover:bg-blue-50 rounded-md">
-                    Project Structure
+                  <button className="text-gray-700 hover:text-blue-600 px-2 py-2 text-xs lg:text-sm font-medium transition-colors duration-200 hover:bg-blue-50 rounded-md">
+                    <span className="hidden lg:inline">Project Structure</span>
+                    <span className="lg:hidden">Projects</span>
                   </button>
                 </Link>
               </div>
@@ -344,16 +376,16 @@ export default function HabnetSolutions() {
 
             {/* Mobile menu button */}
             <div className="md:hidden">
-              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-700 hover:text-blue-600 p-2">
-                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-700 hover:text-blue-600 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md">
+                {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
             </div>
           </div>
 
           {/* Mobile Navigation Menu */}
           {isMobileMenuOpen && (
-            <div className="md:hidden bg-white/40 backdrop-blur-2xl border-t border-blue-200 shadow-2xl rounded-b-xl transition-all duration-300">
-              <div className="px-2 pt-2 pb-3 space-y-1">
+            <div className="md:hidden bg-white/95 backdrop-blur-md border-t border-blue-200 shadow-xl rounded-b-xl transition-all duration-300">
+              <div className="px-3 pt-3 pb-4 space-y-2">
                 {[
                   { name: "Home", id: "hero" },
                   { name: "About Us", id: "about" },
@@ -366,16 +398,16 @@ export default function HabnetSolutions() {
                       scrollToSection(item.id);
                       setIsMobileMenuOpen(false);
                     }}
-                    className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium w-full text-left transition-colors duration-200 hover:bg-blue-50 rounded-md"
+                    className="text-gray-700 hover:text-blue-600 block px-4 py-3 text-base font-medium w-full text-left transition-colors duration-200 hover:bg-blue-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     {item.name}
                   </button>
                 ))}
                 {/* Expandable Services */}
                 <details className="mb-2">
-                  <summary className="flex items-center text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium w-full text-left rounded-md cursor-pointer select-none">
+                  <summary className="flex items-center text-gray-700 hover:text-blue-600 block px-4 py-3 text-base font-medium w-full text-left rounded-lg cursor-pointer select-none focus:outline-none focus:ring-2 focus:ring-blue-500">
                     Our Services
-                    <ChevronDown className="ml-2 h-5 w-5 inline-block" />
+                    <ChevronDown className="ml-2 h-5 w-5 inline-block transition-transform duration-200" />
                   </summary>
                   <ul className="pl-4 mt-2 space-y-1">
                     {[
@@ -395,7 +427,7 @@ export default function HabnetSolutions() {
                             scrollToSection("services");
                             setIsMobileMenuOpen(false);
                           }}
-                          className="w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150 text-base"
+                          className="w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
                         >
                           {service.label}
                         </button>
@@ -404,12 +436,12 @@ export default function HabnetSolutions() {
                   </ul>
                 </details>
                 <Link href="/legal-documents">
-                  <button className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium w-full text-left transition-colors duration-200 hover:bg-blue-50 rounded-md">
+                  <button className="text-gray-700 hover:text-blue-600 block px-4 py-3 text-base font-medium w-full text-left transition-colors duration-200 hover:bg-blue-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     Legal Documents
                   </button>
                 </Link>
                 <Link href="/project-structure">
-                  <button className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium w-full text-left transition-colors duration-200 hover:bg-blue-50 rounded-md">
+                  <button className="text-base font-medium w-full text-left transition-colors duration-200 hover:bg-blue-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     Project Structure
                   </button>
                 </Link>
@@ -425,28 +457,28 @@ export default function HabnetSolutions() {
         className="min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat pt-16 relative"
         style={{ backgroundImage: `url('${heroImages[heroBgIndex]}')`, transition: 'background-image 1s ease-in-out' }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Hero Content */}
             <div className="text-center lg:text-left">
-              <div className="bg-green-100/90 backdrop-blur-sm text-gray-800 p-8 rounded-lg shadow-lg animate-on-scroll">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-6 leading-tight">
+              <div className="bg-white/90 backdrop-blur-md text-gray-800 p-6 sm:p-8 rounded-xl shadow-xl animate-on-scroll border border-white/20">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-800 mb-4 sm:mb-6 leading-tight">
                   HABNET SOLUTIONS LIMITED
-                  <span className="block text-2xl md:text-3xl lg:text-4xl text-gray-700 mt-2">
+                  <span className="block text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-gray-600 mt-2 font-medium">
                     COMPANY PROFILE
                   </span>
                 </h1>
-                <p className="text-xl md:text-2xl text-gray-700 mb-8 leading-relaxed">
+                <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 mb-6 sm:mb-8 leading-relaxed">
                   Innovatively designing and facilitating effective supply systems and services.
                 </p>
               </div>
               <div className="animate-on-scroll mt-6">
                 <Button
                   onClick={() => scrollToSection("services")}
-                  className="bg-gradient-to-r from-green-500 via-blue-500 to-purple-600 hover:from-purple-600 hover:to-green-500 text-white px-8 py-4 text-lg rounded-lg transition-all duration-300 transform hover:scale-110 shadow-2xl hover:shadow-2xl font-bold border-2 border-white"
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl font-semibold border-0 focus:outline-none focus:ring-4 focus:ring-blue-300"
                 >
                   Explore Our Services
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
               </div>
             </div>
@@ -457,23 +489,25 @@ export default function HabnetSolutions() {
                 <Image
                   src="/images/logo.jpeg"
                   alt="Habnet Solutions Limited Logo"
-                  width={600}
-                  height={400}
-                  className="rounded-lg shadow-2xl object-cover"
+                  width={400}
+                  height={300}
+                  className="rounded-xl shadow-2xl object-cover w-full max-w-md mx-auto lg:max-w-lg"
                   style={{ 
                     objectPosition: 'center 25%',
-                    transform: 'scale(1.1)'
+                    transform: 'scale(1.05)'
                   }}
+                  priority
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
                   onError={(e) => {
                     e.currentTarget.src = "/images/logo.jpeg"
                   }}
                 />
                 {/* Floating elements for visual interest */}
-                <div className="absolute -top-4 -right-4 bg-blue-600 text-white p-4 rounded-full shadow-lg animate-bounce">
-                  <Building className="h-8 w-8" />
+                <div className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 bg-blue-600 text-white p-2 sm:p-4 rounded-full shadow-lg animate-bounce">
+                  <Building className="h-4 w-4 sm:h-6 sm:w-6 lg:h-8 lg:w-8" />
                 </div>
-                <div className="absolute -bottom-4 -left-4 bg-green-600 text-white p-4 rounded-full shadow-lg animate-bounce delay-1000">
-                  <Truck className="h-8 w-8" />
+                <div className="absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 bg-green-600 text-white p-2 sm:p-4 rounded-full shadow-lg animate-bounce delay-1000">
+                  <Truck className="h-4 w-4 sm:h-6 sm:w-6 lg:h-8 lg:w-8" />
                 </div>
               </div>
             </div>
@@ -482,17 +516,17 @@ export default function HabnetSolutions() {
       </section>
 
       {/* About Us Section - Company information, mission, and assurance */}
-      <section id="about" className="py-20 bg-white">
+      <section id="about" className="py-12 sm:py-16 lg:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16 animate-on-scroll">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">About Us</h2>
-            <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
+          <div className="text-center mb-12 sm:mb-16 animate-on-scroll">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">About Us</h2>
+            <div className="w-16 sm:w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center mb-12 sm:mb-16">
             {/* About Content */}
             <div className="animate-on-scroll">
-              <div className="space-y-6 text-lg text-gray-700 leading-relaxed">
+              <div className="space-y-4 sm:space-y-6 text-base sm:text-lg text-gray-700 leading-relaxed">
                 <p>
                   Habnet Solutions Limited is committed to professional job satisfaction and continuous professional
                   development of its staff and associates. We are dealers in Office Equipment, Furniture, Computers &
@@ -569,30 +603,30 @@ export default function HabnetSolutions() {
       </section>
 
       {/* Core Values Section - Display values as cards with icons */}
-      <section id="values" className="py-20 bg-gray-50">
+      <section id="values" className="py-12 sm:py-16 lg:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16 animate-on-scroll">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Core Values</h2>
-            <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
-            <p className="text-xl text-gray-600 mt-6 max-w-3xl mx-auto">
+          <div className="text-center mb-12 sm:mb-16 animate-on-scroll">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Core Values</h2>
+            <div className="w-16 sm:w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 mt-6 max-w-3xl mx-auto">
               Our values guide everything we do and define who we are as a company.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {coreValues.map((value, index) => (
               <Card
                 key={index}
                 className="animate-on-scroll bg-white hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-l-4 border-blue-600"
               >
                 <CardHeader className="text-center">
-                  <div className="mx-auto bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                    <value.icon className="h-8 w-8 text-blue-600" />
+                  <div className="mx-auto bg-blue-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mb-4">
+                    <value.icon className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
                   </div>
-                  <CardTitle className="text-lg text-gray-900">{value.title}</CardTitle>
+                  <CardTitle className="text-base sm:text-lg text-gray-900">{value.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600 text-center leading-relaxed">{value.description}</p>
+                  <p className="text-gray-600 text-center leading-relaxed text-sm sm:text-base">{value.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -601,17 +635,17 @@ export default function HabnetSolutions() {
       </section>
 
       {/* Services Section - Tabbed interface for different service categories */}
-      <section id="services" className="py-20 bg-white">
+      <section id="services" className="py-12 sm:py-16 lg:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16 animate-on-scroll">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Services</h2>
-            <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
-            <p className="text-xl text-gray-600 mt-6 max-w-4xl mx-auto leading-relaxed">
+          <div className="text-center mb-12 sm:mb-16 animate-on-scroll">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Services</h2>
+            <div className="w-16 sm:w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 mt-6 max-w-4xl mx-auto leading-relaxed">
               We offer various services under civil works, building works, construction services and a wide range of
               Engineering and Architectural works. Our team of highly qualified professionals is dedicated to building a
               relationship based on mutual trust in order to bring the best services possible to our clients.
             </p>
-            <p className="text-base md:text-lg text-blue-700 font-semibold mt-4 mb-2 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg text-blue-700 font-semibold mt-4 mb-2 max-w-2xl mx-auto">
               We are recognized internationally.{' '}
               <button
                 type="button"
@@ -629,43 +663,43 @@ export default function HabnetSolutions() {
           <div className="animate-on-scroll">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               {/* Service Category Tabs */}
-              <div className="flex items-center w-full mb-8">
+              <div className="flex items-center w-full mb-6 sm:mb-8">
                 <button
                   aria-label="Previous Service"
                   onClick={() => {
                     const idx = serviceTabs.indexOf(activeTab);
                     setActiveTab(serviceTabs[(idx - 1 + serviceTabs.length) % serviceTabs.length]);
                   }}
-                  className="p-2 rounded-full bg-gray-200 hover:bg-blue-200 transition-colors mr-2"
+                  className="p-1 sm:p-2 rounded-full bg-gray-200 hover:bg-blue-200 transition-colors mr-2"
                   disabled={serviceTabs.length <= 1}
                   style={{ visibility: serviceTabs.length > 1 ? 'visible' : 'hidden' }}
                 >
-                  <ChevronLeft className="h-5 w-5 text-blue-600" />
+                  <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                 </button>
-                <TabsList className="flex-1 flex overflow-x-auto scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-blue-100 bg-gray-100 p-1 rounded-lg gap-2 snap-x">
-                  <TabsTrigger value="general-supply" className="text-sm">
+                <TabsList className="flex-1 flex overflow-x-auto scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-blue-100 bg-gray-100 p-1 rounded-lg gap-1 sm:gap-2 snap-x">
+                  <TabsTrigger value="general-supply" className="text-xs sm:text-sm whitespace-nowrap">
                     General Supply
                   </TabsTrigger>
-                  <TabsTrigger value="food-supply" className="text-sm">
+                  <TabsTrigger value="food-supply" className="text-xs sm:text-sm whitespace-nowrap">
                     Food Supply
                   </TabsTrigger>
-                  <TabsTrigger value="construction" className="text-sm">
+                  <TabsTrigger value="construction" className="text-xs sm:text-sm whitespace-nowrap">
                     Construction
                   </TabsTrigger>
-                  <TabsTrigger value="road-construction" className="text-sm">
+                  <TabsTrigger value="road-construction" className="text-xs sm:text-sm whitespace-nowrap">
                     Road Works
                   </TabsTrigger>
-                  <TabsTrigger value="borehole" className="text-sm">
+                  <TabsTrigger value="borehole" className="text-xs sm:text-sm whitespace-nowrap">
                     Water & Sewerage
                   </TabsTrigger>
-                  <TabsTrigger value="materials" className="text-sm">
+                  <TabsTrigger value="materials" className="text-xs sm:text-sm whitespace-nowrap">
                     Materials
                   </TabsTrigger>
-                  <TabsTrigger value="travel-agency" className="text-sm">
-                    Travel Agency Services
+                  <TabsTrigger value="travel-agency" className="text-xs sm:text-sm whitespace-nowrap">
+                    Travel Agency
                   </TabsTrigger>
-                  <TabsTrigger value="tourism" className="text-sm">
-                    Tourism Services
+                  <TabsTrigger value="tourism" className="text-xs sm:text-sm whitespace-nowrap">
+                    Tourism
                   </TabsTrigger>
                 </TabsList>
                 <button
@@ -674,11 +708,11 @@ export default function HabnetSolutions() {
                     const idx = serviceTabs.indexOf(activeTab);
                     setActiveTab(serviceTabs[(idx + 1) % serviceTabs.length]);
                   }}
-                  className="p-2 rounded-full bg-gray-200 hover:bg-blue-200 transition-colors ml-2"
+                  className="p-1 sm:p-2 rounded-full bg-gray-200 hover:bg-blue-200 transition-colors ml-2"
                   disabled={serviceTabs.length <= 1}
                   style={{ visibility: serviceTabs.length > 1 ? 'visible' : 'hidden' }}
                 >
-                  <ChevronRight className="h-5 w-5 text-blue-600" />
+                  <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                 </button>
               </div>
 
@@ -1231,26 +1265,26 @@ export default function HabnetSolutions() {
       </section>
 
       {/* Contact Us Section - Contact information and form */}
-      <section id="contact" className="py-20 bg-gradient-to-br from-blue-100 via-white to-blue-200 animate-on-scroll">
+      <section id="contact" className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-blue-100 via-white to-blue-200 animate-on-scroll">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-blue-900 mb-4">Contact Us</h2>
-            <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
-            <p className="text-xl text-gray-700 mt-6">Get in touch with us for all your business needs</p>
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-900 mb-4">Contact Us</h2>
+            <div className="w-16 sm:w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
+            <p className="text-base sm:text-lg md:text-xl text-gray-700 mt-6">Get in touch with us for all your business needs</p>
           </div>
-          <div className="grid lg:grid-cols-2 gap-12">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
             {/* Contact Information */}
             <div className="animate-on-scroll">
-              <h3 className="text-2xl font-bold text-blue-900 mb-8">Get In Touch</h3>
-              <div className="space-y-6">
+              <h3 className="text-xl sm:text-2xl font-bold text-blue-900 mb-6 sm:mb-8">Get In Touch</h3>
+              <div className="space-y-4 sm:space-y-6">
                 {/* Address */}
-                <div className="flex items-start space-x-4">
-                  <div className="bg-blue-100 p-3 rounded-full">
-                    <MapPin className="h-6 w-6 text-blue-600" />
+                <div className="flex items-start space-x-3 sm:space-x-4">
+                  <div className="bg-blue-100 p-2 sm:p-3 rounded-full flex-shrink-0">
+                    <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-blue-900 mb-1">Address</h4>
-                    <p className="text-gray-700">
+                    <h4 className="font-semibold text-blue-900 mb-1 text-sm sm:text-base">Address</h4>
+                    <p className="text-gray-700 text-sm sm:text-base">
                       MBARIA COMPLEX, KENYATTA AVENUE<br />NYAHURURU DISTRICT, NYAHURURU
                     </p>
                   </div>
@@ -1389,14 +1423,14 @@ export default function HabnetSolutions() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-8 sm:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h3 className="text-2xl font-bold mb-4">HABNET SOLUTIONS LIMITED</h3>
-            <p className="text-gray-400 mb-4">
+            <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">HABNET SOLUTIONS LIMITED</h3>
+            <p className="text-gray-400 mb-3 sm:mb-4 text-sm sm:text-base">
               Innovatively designing and facilitating effective supply systems and services.
             </p>
-            <div className="flex justify-center space-x-6 text-sm text-gray-400">
+            <div className="flex justify-center space-x-6 text-xs sm:text-sm text-gray-400">
               <span>© 2025 Habnet Solutions Limited. All rights reserved.</span>
             </div>
           </div>
@@ -1407,10 +1441,48 @@ export default function HabnetSolutions() {
       {showBackToTop && (
         <button
           onClick={() => scrollToSection("hero")}
-          className="fixed bottom-8 right-8 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 z-40"
+          className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 bg-blue-600 hover:bg-blue-700 text-white p-2 sm:p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 z-40 focus:outline-none focus:ring-2 focus:ring-blue-300"
         >
-          <ChevronUp className="h-6 w-6" />
+          <ChevronUp className="h-5 w-5 sm:h-6 sm:w-6" />
         </button>
+      )}
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed top-4 right-4 z-50">
+          <motion.div
+            initial={{ opacity: 0, x: 300, scale: 0.3 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 300, scale: 0.5 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className={`
+              min-w-[300px] max-w-[400px] p-4 rounded-lg border shadow-lg
+              ${toastType === 'success' 
+                ? 'bg-green-50 border-green-200' 
+                : 'bg-red-50 border-red-200'
+              }
+            `}
+          >
+            <div className="flex items-start gap-3">
+              {toastType === 'success' ? (
+                <CheckCircle className="w-5 h-5 text-green-500" />
+              ) : (
+                <AlertCircle className="w-5 h-5 text-red-500" />
+              )}
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">
+                  {toastMessage}
+                </p>
+              </div>
+              <button
+                onClick={() => setShowToast(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
+        </div>
       )}
     </div>
   )

@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Create SMTP transporter
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,9 +19,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
     }
 
-    const data = await resend.emails.send({
-      from: 'Habnet Solutions <onboarding@resend.dev>', // Replace with your verified sender if needed
-      to: 'scottdavid1363@gmail.com', // Replace with your destination email
+    // Email content
+    const mailOptions = {
+      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      to: process.env.CONTACT_EMAIL || 'habnetsolutionslimited@gmail.com',
       subject: `Contact Form: ${subject}`,
       html: `
         <h2>New Contact Form Submission</h2>
@@ -20,11 +30,25 @@ export async function POST(req: NextRequest) {
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Subject:</strong> ${subject}</p>
         <p><strong>Message:</strong><br/>${message}</p>
+        <hr>
+        <p><small>This email was sent from the Habnet Solutions contact form.</small></p>
       `,
-    });
+      replyTo: email, // Set reply-to as the sender's email
+    };
 
-    return NextResponse.json({ success: true, data });
+    // Send email
+    const info = await transporter.sendMail(mailOptions);
+
+    return NextResponse.json({ 
+      success: true, 
+      messageId: info.messageId,
+      message: 'Email sent successfully'
+    });
   } catch (error) {
-    return NextResponse.json({ success: false, error: (error as Error).message }, { status: 500 });
+    console.error('Email sending error:', error);
+    return NextResponse.json({ 
+      success: false, 
+      error: (error as Error).message 
+    }, { status: 500 });
   }
 } 
