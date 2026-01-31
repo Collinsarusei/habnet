@@ -1,16 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-// Create SMTP transporter
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,10 +10,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
     }
 
-    // Email content
-    const mailOptions = {
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
-      to: process.env.CONTACT_EMAIL || 'habnetsolutionslimited@gmail.com',
+    // Send email using Resend
+    const { data, error } = await resend.emails.send({
+      from: 'Habnet Solutions <onboarding@resend.dev>', // Update this to your verified domain
+      to: ['habnetsolutionslimited@gmail.com'],
+      replyTo: email,
       subject: `Contact Form: ${subject}`,
       html: `
         <h2>New Contact Form Submission</h2>
@@ -33,15 +25,19 @@ export async function POST(req: NextRequest) {
         <hr>
         <p><small>This email was sent from the Habnet Solutions contact form.</small></p>
       `,
-      replyTo: email, // Set reply-to as the sender's email
-    };
+    });
 
-    // Send email
-    const info = await transporter.sendMail(mailOptions);
+    if (error) {
+      console.error('Resend error:', error);
+      return NextResponse.json({ 
+        success: false, 
+        error: error.message 
+      }, { status: 500 });
+    }
 
     return NextResponse.json({ 
       success: true, 
-      messageId: info.messageId,
+      messageId: data?.id,
       message: 'Email sent successfully'
     });
   } catch (error) {
