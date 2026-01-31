@@ -17,6 +17,7 @@ export default function ContactPage() {
     email: "",
     subject: "",
     message: "",
+    honeypot: "", // Bot trap field
   })
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState("")
@@ -64,11 +65,12 @@ export default function ContactPage() {
           email: formData.email,
           subject: formData.subject,
           message: formData.message,
+          honeypot: formData.honeypot,
         }),
       })
 
       if (response.ok) {
-        setFormData({ name: "", email: "", subject: "", message: "" })
+        setFormData({ name: "", email: "", subject: "", message: "", honeypot: "" })
         showNotification(
           "Thank you for your message! We have received it and will get back to you soon.",
           "success"
@@ -77,13 +79,13 @@ export default function ContactPage() {
         const data = await response.json()
         showNotification(
           data.error ||
-            "There was an error sending your message. Please try again or contact us directly at habnetsolutionslimited@gmail.com",
+            "There was an error sending your message. Please try again or contact us directly at info@habnetsolutionslimited.com",
           "error"
         )
       }
     } catch {
       showNotification(
-        "There was an error sending your message. Please try again or contact us directly at habnetsolutionslimited@gmail.com",
+        "There was an error sending your message. Please try again or contact us directly at info@habnetsolutionslimited.com",
         "error"
       )
     } finally {
@@ -171,7 +173,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-blue-900 mb-1 text-lg">Email</h3>
-                    <p className="text-gray-700">habnetsolutions@gmail.com</p>
+                    <p className="text-gray-700">info@habnetsolutionslimited.com</p>
                   </div>
                 </div>
               </div>
@@ -269,6 +271,21 @@ export default function ContactPage() {
                         placeholder="Tell us more about your requirements..."
                       />
                     </div>
+                    
+                    {/* Honeypot field - hidden from users, visible to bots */}
+                    <div className="hidden" aria-hidden="true">
+                      <label htmlFor="honeypot">Leave this field empty</label>
+                      <Input
+                        id="honeypot"
+                        name="honeypot"
+                        type="text"
+                        value={formData.honeypot}
+                        onChange={handleInputChange}
+                        tabIndex={-1}
+                        autoComplete="off"
+                      />
+                    </div>
+                    
                     <Button
                       type="submit"
                       className="w-full bg-gradient-to-r from-green-600 via-teal-600 to-emerald-600 hover:from-emerald-600 hover:to-green-600 text-white py-3 text-lg rounded-lg transition-all duration-300 transform hover:scale-105 shadow-xl font-bold"
@@ -367,7 +384,7 @@ export default function ContactPage() {
                 <br />
                 Phone: +254 725 171365
                 <br />
-                Email: habnetsolutions@gmail.com
+                Email: info@habnetsolutionslimited.com
               </p>
             </div>
           </div>
