@@ -15,7 +15,8 @@ import {
   Plane,
   Camera,
   ChevronUp,
-  ArrowRight
+  ArrowRight,
+  Truck
 } from "lucide-react"
 import Navigation from "@/components/Navigation"
 import WhatsAppButton from "@/components/WhatsAppButton"
@@ -125,6 +126,16 @@ export default function ServicesPage() {
       image: "/images/safari1.jpg",
       description: "Exciting tourism experiences and safari packages",
       link: "/services/tourism"
+    },
+    {
+      id: "logistics",
+      title: "Logistics Services",
+      icon: Truck,
+      bgColor: "bg-slate-100",
+      iconColor: "text-slate-600",
+      image: "/images/Logistics.jpeg",
+      description: "Efficient logistics and transportation solutions for your business",
+      link: "/services/logistics"
     },
   ]
 
