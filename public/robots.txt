@@ -20,7 +20,18 @@ Disallow: /api/
 Allow: /
 Allow: /about
 Allow: /services
+Allow: /services/general-supply
+Allow: /services/food-supply
+Allow: /services/construction
+Allow: /services/road-works
+Allow: /services/water-sewerage
+Allow: /services/materials
+Allow: /services/travel
+Allow: /services/tourism
+Allow: /services/drones
 Allow: /contact
+Allow: /legal-documents
+Allow: /project-structure
 
 # Block common bot traps
 Disallow: /cgi-bin/
