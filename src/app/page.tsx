@@ -6,7 +6,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowRight, Building, Utensils, Wrench, ChevronUp } from "lucide-react"
+import { ArrowRight, Building, Camera, Wrench, ChevronUp } from "lucide-react"
 import Navigation from "@/components/Navigation"
 import WhatsAppButton from "@/components/WhatsAppButton"
 import dynamic from "next/dynamic"
@@ -63,23 +63,24 @@ export default function HomePage() {
       description: "Office equipment, stationery, educational supplies, and medical equipment to meet all your business needs.",
       icon: Building,
       image: "/images/optimized/constructin_materials.webp",
-      href: "/services#general-supply",
+      href: "/services/general-supply",
     },
     {
-      title: "Food Supply",
-      description: "Fresh and quality food supplies including fruits, vegetables, grains, and more for your organization.",
-      icon: Utensils,
-      image: "/images/optimized/food.webp",
-      href: "/services#food-supply",
+      title: "Drones & Aerial Shots",
+      description: "Professional aerial photography and videography services capturing stunning perspectives from the sky.",
+      icon: Camera,
+      image: "/images/drones.png",
+      href: "/services/drones",
     },
     {
       title: "Construction Services",
       description: "Professional construction, renovation, and engineering services for residential and commercial projects.",
       icon: Wrench,
       image: "/images/optimized/construction.webp",
-      href: "/services#construction",
+      href: "/services/construction",
     },
   ]
+    
 
   return (
     <div className="min-h-screen bg-white">

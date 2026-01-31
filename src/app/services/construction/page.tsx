@@ -42,7 +42,7 @@ export default function ConstructionPage() {
             <div className="p-4 bg-white/10 backdrop-blur-sm rounded-2xl">
               <Building className="h-12 w-12" />
             </div>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">House Construction</h1>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">Building & Construction</h1>
           </motion.div>
           <motion.p
             initial={{ opacity: 0, y: 20 }}

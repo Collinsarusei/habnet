@@ -37,6 +37,16 @@ export default function ServicesPage() {
 
   const services = [
     {
+      id: "drones",
+      title: "Drones & Aerial Shots",
+      icon: Camera,
+      bgColor: "bg-pink-100",
+      iconColor: "text-pink-600",
+      image: "/images/drones.png",
+      description: "Professional aerial photography and videography services",
+      link: "/services/drones"
+    },
+    {
       id: "general-supply",
       title: "General Supply of Goods",
       icon: Package,
@@ -58,7 +68,7 @@ export default function ServicesPage() {
     },
     {
       id: "construction",
-      title: "House Construction",
+      title: "Building & Construction",
       icon: Building,
       bgColor: "bg-orange-100",
       iconColor: "text-orange-600",
@@ -115,16 +125,6 @@ export default function ServicesPage() {
       image: "/images/safari1.jpg",
       description: "Exciting tourism experiences and safari packages",
       link: "/services/tourism"
-    },
-    {
-      id: "drones",
-      title: "Drones & Aerial Shots",
-      icon: Camera,
-      bgColor: "bg-pink-100",
-      iconColor: "text-pink-600",
-      image: "/images/drones.png",
-      description: "Professional aerial photography and videography services",
-      link: "/services/drones"
     },
   ]
 
